@@ -21,7 +21,11 @@ namespace RUINS
         public bool triggered; //this is only used for certain special objects
 
         public bool shouldFall = true;
+
         public bool shouldRoll = false; //for use with the ramps
+        public bool rollDirection; //false = left, true = right
+        public int rollAmount; //how much its rolled
+        public int maxRollAmount = 32; //how far it can roll on one push
 
         //for more realistic gravity
         public double additionalWeight = 0;
@@ -48,45 +52,53 @@ namespace RUINS
                 case 0:
                     //rock
                     this.weight = 5;
+                    maxRollAmount = 128;
                     break;
 
                 case 1:
                     //also rock
                     this.weight = 5;
+                    maxRollAmount = 128;
                     break;
 
                 case 2:
                     //platform (can't move)
                     this.weight = 0; //(never falls)
                     shouldFall = false;
+                    maxRollAmount = 0; //just for safety
                     break;
 
                 case 3:
                     //falling platform (moves sometimes)
                     this.weight = 8;
                     shouldFall = false;
+                    maxRollAmount = 0;
                     break;
 
                 case 4:
                     //lava
                     this.weight = 3;
+                    maxRollAmount = 32; //1 square wide
                     break;
 
                 case 5:
                     //left ramp
                     this.weight = 0;
                     shouldFall = false;
+                    maxRollAmount = 0;
                     break;
 
                 case 6:
                     //right ramp
                     this.weight = 0;
                     shouldFall = false;
+                    maxRollAmount = 0;
                     break;
 
                 case 7:
                     this.weight = 0;
                     shouldFall = false;
+                    maxRollAmount = 0;
                     break;
 
             }
@@ -118,10 +130,50 @@ namespace RUINS
                                 {
                                     case 0:
                                         //its the objective rock
+                                        shouldFall = false;
+                                        if(type == 3)
+                                        {
+                                            shouldDestroy = true;
+                                        }
+                                        if(shouldRoll)
+                                        {
+                                            shouldRoll = false;
+                                            rollAmount = 0;
+                                            if(!rollDirection)
+                                            {
+                                                //rolling left
+                                                x = placeholder.x + 32;
+                                            }
+                                            else
+                                            {
+                                                //rolling right
+                                                x = placeholder.x - 32;
+                                            }
+                                        }
                                         break;
 
                                     case 1:
                                         //its another rock
+                                        shouldFall = false;
+                                        if (type == 3)
+                                        {
+                                            shouldDestroy = true;
+                                        }
+                                        if (shouldRoll)
+                                        {
+                                            shouldRoll = false;
+                                            rollAmount = 0;
+                                            if (!rollDirection)
+                                            {
+                                                //rolling left
+                                                x = placeholder.x + 32;
+                                            }
+                                            else
+                                            {
+                                                //rolling right
+                                                x = placeholder.x - 32;
+                                            }
+                                        }
                                         break;
 
                                     case 2:
@@ -151,6 +203,47 @@ namespace RUINS
                                         }
                                         break;
 
+                                    case 5:
+                                        //its a left ramp
+                                        if(type == 0 || type == 1)
+                                        {
+                                            shouldRoll = true;
+                                            rollDirection = false;
+                                        }
+                                        if(type == 3)
+                                        {
+                                            shouldDestroy = true;
+                                        }
+                                        if(type == 4)
+                                        {
+                                            //push it to the block to the left
+                                            rollAmount = 0;
+                                            shouldRoll = true;
+                                            rollDirection = false;
+                                        }
+                                        break;
+
+                                    case 6:
+                                        //its a right ramp
+                                        if(type == 0 || type == 1)
+                                        {
+                                            rollAmount = 0;
+                                            shouldRoll = true;
+                                            rollDirection = true;
+                                        }
+                                        if(type == 3)
+                                        {
+                                            shouldDestroy = true;
+                                        }
+                                        if(type == 4)
+                                        {
+                                            //push to the right
+                                            rollAmount = 0;
+                                            shouldRoll = true;
+                                            rollDirection = true;
+                                        }
+                                        break;
+
                                     case 7:
                                         //its the goal!
                                         if (type == 0)
@@ -158,6 +251,7 @@ namespace RUINS
                                             //you win!
                                             Program.s.render("YOU WIN", 100, 100, System.Drawing.Brushes.Yellow);
                                             Console.WriteLine("VICTORY!!!!!");
+                                            shouldFall = false;
                                         }
                                         else
                                         {
@@ -184,6 +278,36 @@ namespace RUINS
                 y += (weight + (int)additionalWeight);
             if(y > 640)
                 shouldDestroy = true;
+
+            if(shouldRoll)
+            {
+                if(!rollDirection)
+                {
+                    //roll left
+                    if(rollAmount < maxRollAmount)
+                    {
+                        rollAmount += 13 - weight;
+                        x -= (13 - weight);
+                    }
+                    else
+                    {
+                        shouldRoll = false;
+                    }
+                }
+                else
+                {
+                    //roll right
+                    if(rollAmount < maxRollAmount)
+                    {
+                        rollAmount += 13 - weight;
+                        x += (13 - weight);
+                    }
+                    else
+                    {
+                        shouldRoll = false;
+                    }
+                }
+            }
 
             objectRect.x = x;
             objectRect.y = y;
