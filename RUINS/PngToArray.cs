@@ -31,6 +31,12 @@ namespace RUINS
                     //255, 255, 0 = rock;
                     //100, 100, 100 = left ramp
                     //150, 150, 150 = right ramp
+                    //0, 0, 255 = objective rock
+
+                    if (currentPixel.R == 0 && currentPixel.G == 0 && currentPixel.B == 255)
+                    {
+                        tempArray[i, j] = 1;
+                    }
 
                     if (currentPixel.R == 255 && currentPixel.G == 255 && currentPixel.B == 0)
                     {
@@ -57,9 +63,14 @@ namespace RUINS
                         tempArray[i, j] = 6;
                     }
 
-                    if (currentPixel.R == 100 && currentPixel.G == 100 && currentPixel.B == 100)
+                    if (currentPixel.R == 150 && currentPixel.G == 150 && currentPixel.B == 150)
                     {
                         tempArray[i, j] = 7;
+                    }
+
+                    if (currentPixel.R == 0 && currentPixel.G == 255 && currentPixel.B == 0)
+                    {
+                        tempArray[i, j] = 8;
                     }
                     
                 }

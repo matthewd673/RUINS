@@ -28,6 +28,8 @@ namespace RUINS
                     {
                         case 1:
                             //objective rock
+                            PhysicsObject tempObjectiveRock = new PhysicsObject(i * 32, j * 32, 32, 32, 0);
+                            physicsObjects.Add(tempObjectiveRock);
                             break;
 
                         case 2:
@@ -52,6 +54,24 @@ namespace RUINS
                             //lava
                             PhysicsObject tempLava = new PhysicsObject(i * 32, j * 32, 32, 32, 4);
                             physicsObjects.Add(tempLava);
+                            break;
+
+                        case 6:
+                            //left ramp
+                            PhysicsObject tempLeftRamp = new PhysicsObject(i * 32, j * 32, 32, 32, 5);
+                            physicsObjects.Add(tempLeftRamp);
+                            break;
+
+                        case 7:
+                            //right ramp
+                            PhysicsObject tempRightRamp = new PhysicsObject(i * 32, j * 32, 32, 32, 6);
+                            physicsObjects.Add(tempRightRamp);
+                            break;
+
+                        case 8:
+                            //goal
+                            PhysicsObject tempGoal = new PhysicsObject(i * 32, j * 32, 32, 32, 7);
+                            physicsObjects.Add(tempGoal);
                             break;
                     }
                 }
@@ -129,6 +149,21 @@ namespace RUINS
                                 Program.s.render(Program.fallingLava, placeholder.x, placeholder.y);
                             else
                                 Program.s.render(Program.lava, placeholder.x, placeholder.y);
+                            break;
+
+                        case 5:
+                            //left ramp
+                            Program.s.render(Program.leftRamp, placeholder.x, placeholder.y);
+                            break;
+
+                        case 6:
+                            //right ramp
+                            Program.s.render(Program.rightRamp, placeholder.x, placeholder.y);
+                            break;
+
+                        case 7:
+                            //goal
+                            Program.s.render(Program.goal, placeholder.x, placeholder.y);
                             break;
                     }
 

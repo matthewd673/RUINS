@@ -31,6 +31,7 @@ namespace RUINS
         public static Prop leftRamp;
         public static Prop rightRamp;
         public static Prop spring;
+        public static Prop goal;
         
         public static ArrayList eventLog = new ArrayList();
 
@@ -51,6 +52,7 @@ namespace RUINS
             leftRamp = new Prop(new Bitmap(prefix + "ramp-left.png"), 32, 32);
             rightRamp = new Prop(new Bitmap(prefix + "ramp-right.png"), 32, 32);
             spring = new Prop(new Bitmap(prefix + "spring.png"), 32, 32);
+            goal = new Prop(new Bitmap(prefix + "goal.png"), 32, 32);
 
             LevelEditor.initMap();
             Gameplay.initGameplay(PngToArray.createArray("test-level"));

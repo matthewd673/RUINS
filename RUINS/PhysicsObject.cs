@@ -21,6 +21,7 @@ namespace RUINS
         public bool triggered; //this is only used for certain special objects
 
         public bool shouldFall = true;
+        public bool shouldRoll = false; //for use with the ramps
 
         //for more realistic gravity
         public double additionalWeight = 0;
@@ -69,7 +70,24 @@ namespace RUINS
                 case 4:
                     //lava
                     this.weight = 3;
-                    break;           
+                    break;
+
+                case 5:
+                    //left ramp
+                    this.weight = 0;
+                    shouldFall = false;
+                    break;
+
+                case 6:
+                    //right ramp
+                    this.weight = 0;
+                    shouldFall = false;
+                    break;
+
+                case 7:
+                    this.weight = 0;
+                    shouldFall = false;
+                    break;
 
             }
             objectRect = new Rect(this.x, this.y, this.width, this.height);
@@ -128,6 +146,20 @@ namespace RUINS
                                     case 4:
                                         //its lava
                                         if(type == 0 || type == 1 || type == 3)
+                                        {
+                                            shouldDestroy = true;
+                                        }
+                                        break;
+
+                                    case 7:
+                                        //its the goal!
+                                        if (type == 0)
+                                        {
+                                            //you win!
+                                            Program.s.render("YOU WIN", 100, 100, System.Drawing.Brushes.Yellow);
+                                            Console.WriteLine("VICTORY!!!!!");
+                                        }
+                                        else
                                         {
                                             shouldDestroy = true;
                                         }

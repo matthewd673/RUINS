@@ -87,6 +87,11 @@ namespace RUINS
                             //right ramp
                             Program.s.render(Program.rightRamp, i * 32, j * 32);
                             break;
+
+                        case 8:
+                            //goal
+                            Program.s.render(Program.goal, i * 32, j * 32);
+                            break;
                     }
                 }
             }
