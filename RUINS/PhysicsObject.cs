@@ -20,6 +20,8 @@ namespace RUINS
         public bool shouldDestroy;
         public bool triggered; //this is only used for certain special objects
 
+        public bool shouldFall = true;
+
         //create a rect for each object
         public Rect objectRect;
 
@@ -65,6 +67,45 @@ namespace RUINS
 
         public void update()
         {
+            //check collisions
+            //but only for certain physicsobjects (right now its just the rocks)
+            if (type == 0 || type == 1)
+            {
+                for (int i = 0; i < Program.physicsObjects.Count; i++)
+                {
+                    //check the type
+                    //mostly for safety purposes
+                    if (Program.physicsObjects[i].GetType() == typeof(PhysicsObject))
+                    {
+                        PhysicsObject placeholder = (PhysicsObject)Program.physicsObjects[i];
+                        if (placeholder.objectRect != objectRect)
+                        {
+                            if (objectRect.intersects(placeholder.objectRect))
+                            {
+                                Console.WriteLine("collision!");
+                                //they have collided!
+                                switch (placeholder.type)
+                                {
+                                    case 0:
+                                        //its the objective rock
+                                        break;
+
+                                    case 1:
+                                        //its another rock
+                                        break;
+
+                                    case 2:
+                                        //its a platform
+                                        Console.WriteLine("platform");
+                                        shouldFall = false;
+                                        y--;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             //this is SUPER primitive
             if(triggered)
             {
@@ -75,9 +116,13 @@ namespace RUINS
                         break;
                 }
             }
-            y += weight;
-            if(y > 800)
+            if(shouldFall)
+                y += weight;
+            if(y > 640)
                 shouldDestroy = true;
+
+            objectRect.x = x;
+            objectRect.y = y;
         }
 
     }

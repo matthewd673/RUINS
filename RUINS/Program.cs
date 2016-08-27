@@ -49,10 +49,14 @@ namespace RUINS
 
             //temporary code
             testRock = new PhysicsObject(0, 0, 32, 32, 0);
+            //manually set collisions (for testing purposes)
+            testRock.objectRect = new neon2d.Physics.Rect(0, 0, 32, 32);
             physicsObjects.Add(testRock);
             addEvent("Objective Rock spawned!");
 
-            testPlatform = new PhysicsObject(50, 50, 32, 32, 2);
+            testPlatform = new PhysicsObject(0, 200, 32, 32, 2);
+            //manually set collisions (for testing purposes)
+            testPlatform.objectRect = new neon2d.Physics.Rect(0, 200, 32, 32);
             physicsObjects.Add(testPlatform);
             addEvent("Platform built");
 
@@ -66,6 +70,9 @@ namespace RUINS
 
         public static void update()
         {
+            if (currentScreen == 0)
+                MainMenu.menu();
+
             if (currentScreen == 1)
                 Gameplay.play();
 
