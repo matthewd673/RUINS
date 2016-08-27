@@ -54,6 +54,15 @@ namespace RUINS
                             //falling platform
                             Program.s.render(Program.fallingPlatform, placeholder.x, placeholder.y);
                             break;
+
+                        case 4:
+                            //lava
+                            //really just a visual effect here
+                            if (placeholder.shouldFall)
+                                Program.s.render(Program.fallingLava, placeholder.x, placeholder.y);
+                            else
+                                Program.s.render(Program.lava, placeholder.x, placeholder.y);
+                            break;
                     }
 
                     //save back our changes (if not destroyed)

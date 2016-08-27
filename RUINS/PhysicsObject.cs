@@ -59,7 +59,12 @@ namespace RUINS
                 case 3:
                     //falling platform (moves sometimes)
                     this.weight = 0;
-                    break;            
+                    break;
+
+                case 4:
+                    //lava
+                    this.weight = 3;
+                    break;           
 
             }
             objectRect = new Rect(this.x, this.y, this.width, this.height);
@@ -68,8 +73,10 @@ namespace RUINS
         public void update()
         {
             //check collisions
-            //but only for certain physicsobjects (right now its just the rocks)
-            if (type == 0 || type == 1)
+            //but only for certain physicsobjects
+            //THE LAVA DOES NOT DETECT COLLISIONS WITH ROCKS
+            //the lava detects collisions with platforms, the rocks detect collisions with lava
+            if (type == 0 || type == 1 || type == 3 || type == 4)
             {
                 for (int i = 0; i < Program.physicsObjects.Count; i++)
                 {
@@ -99,6 +106,19 @@ namespace RUINS
                                         Console.WriteLine("platform");
                                         shouldFall = false;
                                         y--;
+                                        if(type == 3)
+                                        {
+                                            //falling platform
+                                            shouldDestroy = true;
+                                        }
+                                        break;
+
+                                    case 4:
+                                        //its lava
+                                        if(type == 0 || type == 1 || type == 3)
+                                        {
+                                            shouldDestroy = true;
+                                        }
                                         break;
                                 }
                             }
@@ -112,7 +132,7 @@ namespace RUINS
                 switch(type)
                 {
                     case 3:
-                        weight = 5;
+                        weight = 8;
                         break;
                 }
             }

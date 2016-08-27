@@ -18,18 +18,21 @@ namespace RUINS
         public static Game g;
 
         //keep track of what screen we're on
-        public static int currentScreen = 1; //0 = menu, 1 = game, 2 = editor
+        public static int currentScreen = 2; //0 = menu, 1 = game, 2 = editor
 
         //graphics
         public static Prop objectiveRock;
         public static Prop rock;
         public static Prop platform;
         public static Prop fallingPlatform;
+        public static Prop lava;
+        public static Prop fallingLava;
 
         //PhysicsObjects
         public static PhysicsObject testRock;
         public static PhysicsObject testPlatform;
         public static PhysicsObject testFallingPlatform;
+        public static PhysicsObject testLava;
 
         public static ArrayList physicsObjects = new ArrayList();
         public static ArrayList eventLog = new ArrayList();
@@ -46,17 +49,15 @@ namespace RUINS
             rock = new Prop(new Bitmap(prefix + "rock.png"), 32, 32);
             platform = new Prop(new Bitmap(prefix + "platform.png"), 32, 32);
             fallingPlatform = new Prop(new Bitmap(prefix + "falling-platform.png"), 32, 32);
+            lava = new Prop(new Bitmap(prefix + "lava.png"), 32, 32);
+            fallingLava = new Prop(new Bitmap(prefix + "falling-lava.png"), 32, 32);
 
             //temporary code
-            testRock = new PhysicsObject(0, 0, 32, 32, 0);
-            //manually set collisions (for testing purposes)
-            testRock.objectRect = new neon2d.Physics.Rect(0, 0, 32, 32);
-            physicsObjects.Add(testRock);
+            testRock = new PhysicsObject(0, 0, 32, 32, 1);
+            //physicsObjects.Add(testRock);
             addEvent("Objective Rock spawned!");
 
             testPlatform = new PhysicsObject(0, 200, 32, 32, 2);
-            //manually set collisions (for testing purposes)
-            testPlatform.objectRect = new neon2d.Physics.Rect(0, 200, 32, 32);
             physicsObjects.Add(testPlatform);
             addEvent("Platform built");
 
@@ -64,6 +65,12 @@ namespace RUINS
             testFallingPlatform.triggered = true;
             physicsObjects.Add(testFallingPlatform);
             addEvent("Falling platform built");
+
+            testLava = new PhysicsObject(0, 0, 32, 32, 3);
+            physicsObjects.Add(testLava);
+            addEvent("Lava poured");
+
+            LevelEditor.initMap();
 
             g.runGame();
         }

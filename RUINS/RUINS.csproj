@@ -52,6 +52,7 @@
     <Compile Include="LevelEditor.cs" />
     <Compile Include="MainMenu.cs" />
     <Compile Include="PhysicsObject.cs" />
+    <Compile Include="PngToArray.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

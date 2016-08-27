@@ -28,6 +28,9 @@ namespace RUINS
                     clickTiles.Add(newRect);
                 }
             }
+            //fill the space in with a demo level
+            //this is very temporary, but LevelEditor is best equipped for the test
+            map = PngToArray.createArray("test-level");
         }
 
         public static void edit()
@@ -42,8 +45,22 @@ namespace RUINS
                 }
             }
 
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 20; j++)
+                {
+                    switch(map[i, j])
+                    {
+                        case 1:
+                            //platform
+                            Program.s.render(Program.platform, i * 32, j * 32);
+                            break;
+                    }
+                }
+            }
+
             //NOTE TO SELF: Work on this later
-            for(int i = 0; i < clickTiles.Count; i++)
+            for (int i = 0; i < clickTiles.Count; i++)
             {
                 //safety first!
                 if(clickTiles[i].GetType() == typeof(Rect))
@@ -51,13 +68,13 @@ namespace RUINS
                     Rect placeholder = (Rect)clickTiles[i];
                     int mouseX = Program.s.getMouseX();
                     int mouseY = Program.s.getMouseY();
-                    MessageBox.Show(mouseX.ToString() + "; " + mouseY.ToString());
                     if(placeholder.intersects(new Vector2i(mouseX, mouseY)))
                     {
                         Program.s.render(new Shape.Rectangle(32, 32, true), (int)placeholder.x, (int)placeholder.y, 1, Brushes.Orange);
                     }
                 }
             }
+            
         }
 
     }
