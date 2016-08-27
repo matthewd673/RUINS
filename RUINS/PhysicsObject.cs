@@ -107,6 +107,11 @@ namespace RUINS
 
         public void update()
         {
+            /*NOTE:
+             * These physics are mediocre at best,
+             * sloppy and fairly bad at worst.
+             * Please don't use this in your own projects.
+             */
             //check collisions
             //but only for certain physicsobjects
             //THE LAVA DOES NOT DETECT COLLISIONS WITH ROCKS
@@ -131,10 +136,12 @@ namespace RUINS
                                     case 0:
                                         //its the objective rock
                                         shouldFall = false;
+                                        /*
                                         if(type == 3)
                                         {
                                             shouldDestroy = true;
                                         }
+                                        */
                                         if(shouldRoll)
                                         {
                                             shouldRoll = false;
@@ -155,10 +162,6 @@ namespace RUINS
                                     case 1:
                                         //its another rock
                                         shouldFall = false;
-                                        if (type == 3)
-                                        {
-                                            shouldDestroy = true;
-                                        }
                                         if (shouldRoll)
                                         {
                                             shouldRoll = false;
@@ -177,22 +180,65 @@ namespace RUINS
                                         break;
 
                                     case 2:
-                                        //its a platform
-                                        Console.WriteLine("platform");
+                                        //Good enough
                                         shouldFall = false;
-                                        y--;
+                                        if (placeholder.y - y < 8)
+                                        {
+                                            shouldRoll = false;
+                                            if (!rollDirection)
+                                            {
+                                                //rolling left
+                                                x = placeholder.x + 32;
+                                            }
+                                            else
+                                            {
+                                                x = placeholder.x - 32;
+                                            }
+                                        }
+                                        if (Gameplay.currentMap[(x / 32) + 1, (y / 32)] == 0)
+                                        {
+                                            if(x > placeholder.x + 31)
+                                            {
+                                                shouldFall = true;
+                                            }
+                                        }
+                                        if(Gameplay.currentMap[(x / 32) - 1, (y / 32)] == 0)
+                                        {
+                                            if(x < placeholder.x - 3)
+                                            {
+                                                shouldFall = true;
+                                            }
+                                        }
+
+                                        if(!shouldFall)
+                                        {
+                                            y = placeholder.y - 32;
+                                        }
+
                                         if(type == 3)
                                         {
                                             //falling platform
                                             shouldDestroy = true;
                                         }
+                                        
                                         break;
 
                                     case 3:
                                         //its a falling platform
-                                        Console.WriteLine("falling platform");
                                         placeholder.triggered = true;
-                                        y--;
+                                        if (placeholder.y - y < 8)
+                                        {
+                                            shouldRoll = false;
+                                            if (!rollDirection)
+                                            {
+                                                //rolling left
+                                                x = placeholder.x + 32;
+                                            }
+                                            else
+                                            {
+                                                x = placeholder.x - 32;
+                                            }
+                                        }
                                         break;
 
                                     case 4:
@@ -207,8 +253,12 @@ namespace RUINS
                                         //its a left ramp
                                         if(type == 0 || type == 1)
                                         {
-                                            shouldRoll = true;
-                                            rollDirection = false;
+                                            if (shouldFall)
+                                            {
+                                                rollAmount = 0;
+                                                shouldRoll = true;
+                                                rollDirection = false;
+                                            }
                                         }
                                         if(type == 3)
                                         {
@@ -217,9 +267,12 @@ namespace RUINS
                                         if(type == 4)
                                         {
                                             //push it to the block to the left
-                                            rollAmount = 0;
-                                            shouldRoll = true;
-                                            rollDirection = false;
+                                            if (shouldFall)
+                                            {
+                                                rollAmount = 0;
+                                                shouldRoll = true;
+                                                rollDirection = false;
+                                            }
                                         }
                                         break;
 
@@ -227,9 +280,12 @@ namespace RUINS
                                         //its a right ramp
                                         if(type == 0 || type == 1)
                                         {
-                                            rollAmount = 0;
-                                            shouldRoll = true;
-                                            rollDirection = true;
+                                            if (shouldFall)
+                                            {
+                                                rollAmount = 0;
+                                                shouldRoll = true;
+                                                rollDirection = true;
+                                            }
                                         }
                                         if(type == 3)
                                         {
@@ -238,9 +294,12 @@ namespace RUINS
                                         if(type == 4)
                                         {
                                             //push to the right
-                                            rollAmount = 0;
-                                            shouldRoll = true;
-                                            rollDirection = true;
+                                            if (shouldFall)
+                                            {
+                                                rollAmount = 0;
+                                                shouldRoll = true;
+                                                rollDirection = true;
+                                            }
                                         }
                                         break;
 

@@ -118,7 +118,7 @@ namespace RUINS
                         physicsObjects.Remove(physicsObjects[i]);
                         Program.addEvent("Object destroyed");
                     }
-
+                    
                     //render PhysicsObjects
                     switch (placeholder.type)
                     {

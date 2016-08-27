@@ -18,7 +18,7 @@ namespace RUINS
         public static Game g;
 
         //keep track of what screen we're on
-        public static int currentScreen = 1; //0 = menu, 1 = game, 2 = editor
+        public static int currentScreen = 2; //0 = menu, 1 = game, 2 = editor
 
         //graphics
         //NOTE: SPRING IS TEMPORARY
@@ -32,12 +32,13 @@ namespace RUINS
         public static Prop rightRamp;
         public static Prop spring;
         public static Prop goal;
-        
+
         public static ArrayList eventLog = new ArrayList();
 
         static void Main(string[] args)
         {
-            w = new Window(640, 640, "RUINS - Ludum Dare 36 entry");
+            w = new Window(800, 800, "RUINS - Ludum Dare 36 entry");
+            w.gamewindow.MaximizeBox = false;
             s = new Scene(w);
             g = new Game(w, s, new Action(update));
 
@@ -54,8 +55,8 @@ namespace RUINS
             spring = new Prop(new Bitmap(prefix + "spring.png"), 32, 32);
             goal = new Prop(new Bitmap(prefix + "goal.png"), 32, 32);
 
-            LevelEditor.initMap();
-            Gameplay.initGameplay(PngToArray.createArray("test-level"));
+            LevelEditor.initMap("test-level");
+            Gameplay.initGameplay(PngToArray.createArray("level1"));
 
             g.runGame();
         }

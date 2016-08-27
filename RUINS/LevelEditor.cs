@@ -18,7 +18,9 @@ namespace RUINS
         public static int[,] map = new int[20, 20];
         public static ArrayList clickTiles = new ArrayList();
 
-        public static void initMap()
+        public static bool customMap;
+
+        public static void initMap(string mapName)
         {
             for (int i = 0; i <= 20; i++)
             {
@@ -28,9 +30,12 @@ namespace RUINS
                     clickTiles.Add(newRect);
                 }
             }
-            //fill the space in with a demo level
-            //this is very temporary, but LevelEditor is best equipped for the test
-            map = PngToArray.createArray("test-level");
+
+            if (mapName == "CUSTOM")
+                customMap = true;
+
+            if(!customMap)
+                map = PngToArray.createArray(mapName);
         }
 
         public static void edit()
@@ -106,7 +111,41 @@ namespace RUINS
                     int mouseY = Program.s.getMouseY();
                     if(placeholder.intersects(new Vector2i(mouseX, mouseY)))
                     {
-                        Program.s.render(new Shape.Rectangle(32, 32, true), (int)placeholder.x, (int)placeholder.y, 1, Brushes.Orange);
+                        Program.s.render(new Shape.Rectangle(32, 32), (int)placeholder.x, (int)placeholder.y, 3, Brushes.Orange);
+                        int mapValue = 0;
+                        if((int)(placeholder.x / 32) < 20 && (int)(placeholder.y / 32) < 20)
+                            mapValue = map[(int)placeholder.x / 32, (int)placeholder.y / 32];
+                        //identify tile
+                        switch(mapValue)
+                        {
+                            case 0:
+                                Program.s.render("Tile: Nothing", 0, 672, Brushes.White);
+                                break;
+                            case 1:
+                                Program.s.render("Tile: Objective Rock", 0, 672, Brushes.White);
+                                break;
+                            case 2:
+                                Program.s.render("Tile: Rock", 0, 672, Brushes.White);
+                                break;
+                            case 3:
+                                Program.s.render("Tile: Platform", 0, 672, Brushes.White);
+                                break;
+                            case 4:
+                                Program.s.render("Tile: Falling Platform", 0, 672, Brushes.White);
+                                break;
+                            case 5:
+                                Program.s.render("Tile: Lava", 0, 672, Brushes.White);
+                                break;
+                            case 6:
+                                Program.s.render("Tile: Left-facing Ramp", 0, 672, Brushes.White);
+                                break;
+                            case 7:
+                                Program.s.render("Tile: Right-facing Ramp", 0, 672, Brushes.White);
+                                break;
+                            case 8:
+                                Program.s.render("Tile: Goal", 0, 672, Brushes.White);
+                                break;
+                        }
                     }
                 }
             }
