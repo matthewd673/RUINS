@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,24 +12,90 @@ namespace RUINS
 {
     public class Gameplay
     {
+        
+        public static int[,] currentMap = new int[20, 20];
+        public static ArrayList physicsObjects = new ArrayList();
+
+        public static void initGameplay(int[,] map)
+        {
+            currentMap = map;
+
+            for(int i = 0; i < 20; i++)
+            {
+                for(int j = 0; j < 20; j++)
+                {
+                    switch(map[i, j])
+                    {
+                        case 1:
+                            //objective rock
+                            break;
+
+                        case 2:
+                            //rock
+                            PhysicsObject tempRock = new PhysicsObject(i * 32, j * 32, 32, 32, 1);
+                            physicsObjects.Add(tempRock);
+                            break;
+
+                        case 3:
+                            //platform
+                            PhysicsObject tempPlatform = new PhysicsObject(i * 32, j * 32, 32, 32, 2);
+                            physicsObjects.Add(tempPlatform);
+                            break;
+
+                        case 4:
+                            //falling platform
+                            PhysicsObject tempFallingPlatform = new PhysicsObject(i * 32, j * 32, 32, 32, 3);
+                            physicsObjects.Add(tempFallingPlatform);
+                            break;
+
+                        case 5:
+                            //lava
+                            PhysicsObject tempLava = new PhysicsObject(i * 32, j * 32, 32, 32, 4);
+                            physicsObjects.Add(tempLava);
+                            break;
+                    }
+                }
+            }
+        }
 
         public static void play()
         {
-            for (int i = 0; i < Program.physicsObjects.Count; i++)
+            simulate();
+            for (int i = 0; i < Program.eventLog.Count; i++)
+            {
+                //pretty much the same as with PhysicsObjects
+                if (Program.eventLog[i].GetType() == typeof(Program.gameEvent))
+                {
+                    Program.gameEvent placeholder = (Program.gameEvent)Program.eventLog[i];
+                    Program.s.render(placeholder.eventString, 0, i * 12, Brushes.White);
+                }
+            }
+        }
+
+        public static void simulate()
+        {
+            for (int i = 0; i < physicsObjects.Count; i++)
             {
                 //just a saftey measure
-                if (Program.physicsObjects[i].GetType() == typeof(PhysicsObject))
+                if (physicsObjects[i].GetType() == typeof(PhysicsObject))
                 {
                     //get the object into a useable state
-                    PhysicsObject placeholder = (PhysicsObject)Program.physicsObjects[i];
+                    PhysicsObject placeholder = (PhysicsObject)physicsObjects[i];
 
                     //modify the object
                     placeholder.update();
+                    if (placeholder.shouldFall)
+                        placeholder.additionalWeight += 0.1;
+                    else
+                        placeholder.additionalWeight = 0;
+                    //gotta cap it somewhere
+                    if (placeholder.additionalWeight > placeholder.weight + 3)
+                        placeholder.additionalWeight = placeholder.weight + 3;
 
                     //check for destruction, etc.
                     if (placeholder.shouldDestroy)
                     {
-                        Program.physicsObjects.Remove(Program.physicsObjects[i]);
+                        physicsObjects.Remove(physicsObjects[i]);
                         Program.addEvent("Object destroyed");
                     }
 
@@ -67,17 +134,7 @@ namespace RUINS
 
                     //save back our changes (if not destroyed)
                     if (!placeholder.shouldDestroy)
-                        Program.physicsObjects[i] = placeholder;
-                }
-            }
-
-            for (int i = 0; i < Program.eventLog.Count; i++)
-            {
-                //pretty much the same as with PhysicsObjects
-                if (Program.eventLog[i].GetType() == typeof(Program.gameEvent))
-                {
-                    Program.gameEvent placeholder = (Program.gameEvent)Program.eventLog[i];
-                    Program.s.render(placeholder.eventString, 0, i * 12, Brushes.White);
+                        physicsObjects[i] = placeholder;
                 }
             }
         }

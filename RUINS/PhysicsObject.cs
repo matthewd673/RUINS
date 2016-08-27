@@ -22,6 +22,9 @@ namespace RUINS
 
         public bool shouldFall = true;
 
+        //for more realistic gravity
+        public double additionalWeight = 0;
+
         //create a rect for each object
         public Rect objectRect;
 
@@ -54,11 +57,13 @@ namespace RUINS
                 case 2:
                     //platform (can't move)
                     this.weight = 0; //(never falls)
+                    shouldFall = false;
                     break;
 
                 case 3:
                     //falling platform (moves sometimes)
-                    this.weight = 0;
+                    this.weight = 8;
+                    shouldFall = false;
                     break;
 
                 case 4:
@@ -78,13 +83,13 @@ namespace RUINS
             //the lava detects collisions with platforms, the rocks detect collisions with lava
             if (type == 0 || type == 1 || type == 3 || type == 4)
             {
-                for (int i = 0; i < Program.physicsObjects.Count; i++)
+                for (int i = 0; i < Gameplay.physicsObjects.Count; i++)
                 {
                     //check the type
                     //mostly for safety purposes
-                    if (Program.physicsObjects[i].GetType() == typeof(PhysicsObject))
+                    if (Gameplay.physicsObjects[i].GetType() == typeof(PhysicsObject))
                     {
-                        PhysicsObject placeholder = (PhysicsObject)Program.physicsObjects[i];
+                        PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[i];
                         if (placeholder.objectRect != objectRect)
                         {
                             if (objectRect.intersects(placeholder.objectRect))
@@ -113,6 +118,13 @@ namespace RUINS
                                         }
                                         break;
 
+                                    case 3:
+                                        //its a falling platform
+                                        Console.WriteLine("falling platform");
+                                        placeholder.triggered = true;
+                                        y--;
+                                        break;
+
                                     case 4:
                                         //its lava
                                         if(type == 0 || type == 1 || type == 3)
@@ -132,12 +144,12 @@ namespace RUINS
                 switch(type)
                 {
                     case 3:
-                        weight = 8;
+                        shouldFall = true;
                         break;
                 }
             }
             if(shouldFall)
-                y += weight;
+                y += (weight + (int)additionalWeight);
             if(y > 640)
                 shouldDestroy = true;
 

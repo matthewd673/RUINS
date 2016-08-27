@@ -18,23 +18,20 @@ namespace RUINS
         public static Game g;
 
         //keep track of what screen we're on
-        public static int currentScreen = 2; //0 = menu, 1 = game, 2 = editor
+        public static int currentScreen = 1; //0 = menu, 1 = game, 2 = editor
 
         //graphics
+        //NOTE: SPRING IS TEMPORARY
         public static Prop objectiveRock;
         public static Prop rock;
         public static Prop platform;
         public static Prop fallingPlatform;
         public static Prop lava;
         public static Prop fallingLava;
-
-        //PhysicsObjects
-        public static PhysicsObject testRock;
-        public static PhysicsObject testPlatform;
-        public static PhysicsObject testFallingPlatform;
-        public static PhysicsObject testLava;
-
-        public static ArrayList physicsObjects = new ArrayList();
+        public static Prop leftRamp;
+        public static Prop rightRamp;
+        public static Prop spring;
+        
         public static ArrayList eventLog = new ArrayList();
 
         static void Main(string[] args)
@@ -51,26 +48,12 @@ namespace RUINS
             fallingPlatform = new Prop(new Bitmap(prefix + "falling-platform.png"), 32, 32);
             lava = new Prop(new Bitmap(prefix + "lava.png"), 32, 32);
             fallingLava = new Prop(new Bitmap(prefix + "falling-lava.png"), 32, 32);
-
-            //temporary code
-            testRock = new PhysicsObject(0, 0, 32, 32, 1);
-            //physicsObjects.Add(testRock);
-            addEvent("Objective Rock spawned!");
-
-            testPlatform = new PhysicsObject(0, 200, 32, 32, 2);
-            physicsObjects.Add(testPlatform);
-            addEvent("Platform built");
-
-            testFallingPlatform = new PhysicsObject(82, 50, 32, 32, 3);
-            testFallingPlatform.triggered = true;
-            physicsObjects.Add(testFallingPlatform);
-            addEvent("Falling platform built");
-
-            testLava = new PhysicsObject(0, 0, 32, 32, 3);
-            physicsObjects.Add(testLava);
-            addEvent("Lava poured");
+            leftRamp = new Prop(new Bitmap(prefix + "ramp-left.png"), 32, 32);
+            rightRamp = new Prop(new Bitmap(prefix + "ramp-right.png"), 32, 32);
+            spring = new Prop(new Bitmap(prefix + "spring.png"), 32, 32);
 
             LevelEditor.initMap();
+            Gameplay.initGameplay(PngToArray.createArray("test-level"));
 
             g.runGame();
         }
@@ -99,6 +82,7 @@ namespace RUINS
             }
         }
 
+        //this should be changed up later on
         public static void addEvent(string eventString)
         {
             gameEvent ge = new gameEvent(eventString);

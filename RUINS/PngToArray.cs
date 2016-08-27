@@ -28,10 +28,40 @@ namespace RUINS
                     //64, 64, 64 = falling platform
                     //255, 0, 0 = lava
                     //0, 255, 0 = goal
+                    //255, 255, 0 = rock;
+                    //100, 100, 100 = left ramp
+                    //150, 150, 150 = right ramp
+
+                    if (currentPixel.R == 255 && currentPixel.G == 255 && currentPixel.B == 0)
+                    {
+                        tempArray[i, j] = 2;
+                    }
+
                     if (currentPixel.R == 0 && currentPixel.G == 0 && currentPixel.B == 0)
                     {
-                        tempArray[i, j] = 1;
+                        tempArray[i, j] = 3;
                     }
+
+                    if (currentPixel.R == 64 && currentPixel.G == 64 && currentPixel.B == 64)
+                    {
+                        tempArray[i, j] = 4;
+                    }
+
+                    if (currentPixel.R == 255 && currentPixel.G == 0 && currentPixel.B == 0)
+                    {
+                        tempArray[i, j] = 5;
+                    }
+
+                    if (currentPixel.R == 100 && currentPixel.G == 100 && currentPixel.B == 100)
+                    {
+                        tempArray[i, j] = 6;
+                    }
+
+                    if (currentPixel.R == 100 && currentPixel.G == 100 && currentPixel.B == 100)
+                    {
+                        tempArray[i, j] = 7;
+                    }
+                    
                 }
             }
             return tempArray;

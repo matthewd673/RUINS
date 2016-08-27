@@ -49,17 +49,48 @@ namespace RUINS
             {
                 for (int j = 0; j < 20; j++)
                 {
+                    //these values are consistent with the PhysicsObject "type"s + 1 to account for empty space
                     switch(map[i, j])
                     {
+
                         case 1:
+                            //objective rock
+                            Program.s.render(Program.objectiveRock, i * 32, j * 32);
+                            break;
+
+                        case 2:
+                            //rock
+                            Program.s.render(Program.rock, i * 32, j * 32);
+                            break;
+
+                        case 3:
                             //platform
                             Program.s.render(Program.platform, i * 32, j * 32);
+                            break;
+
+                        case 4:
+                            //falling platform
+                            Program.s.render(Program.fallingPlatform, i * 32, j * 32);
+                            break;
+
+                        case 5:
+                            //lava
+                            Program.s.render(Program.lava, i * 32, j * 32);
+                            break;
+
+                        case 6:
+                            //left ramp
+                            Program.s.render(Program.leftRamp, i * 32, j * 32);
+                            break;
+
+                        case 7:
+                            //right ramp
+                            Program.s.render(Program.rightRamp, i * 32, j * 32);
                             break;
                     }
                 }
             }
-
-            //NOTE TO SELF: Work on this later
+            
             for (int i = 0; i < clickTiles.Count; i++)
             {
                 //safety first!
