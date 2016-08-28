@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
@@ -30,6 +32,10 @@ namespace RUINS
         //the amount of each resource available
         //this will be different between planing mode and level edit mode
         public static int[,] resources = new int[10, 5];
+
+        public static bool isCopied = false;
+
+        public static string pastedString;
 
         public static void initMap(string mapName)
         {
@@ -72,7 +78,7 @@ namespace RUINS
                 for (int j = 0; j <= 20; j++)
                 {
                     //fill in the tiles
-                    //Program.s.render(new Shape.Rectangle(32, 32), i * 32, j * 32, 1, Brushes.Gray);
+                    Program.s.render(new Shape.Rectangle(32, 32), i * 32, j * 32, 1, Brushes.Gray);
                 }
             }
 
@@ -200,9 +206,9 @@ namespace RUINS
             if (!customMap)
                 Program.s.render("However, you cannot remove/overwrite preset blocks (outlined in red), try to work around them to solve the puzzle.", 0, 727, Brushes.Orange);
             if (!customMap)
-                Program.s.render("Press [ENTER] to run the level. If you fail, you'll be brought back here", 0, 742, Brushes.Orange);
+                Program.s.render("Press [S] to run the level. If you fail, you'll be brought back here", 0, 742, Brushes.Orange);
             else
-                Program.s.render("Press [ENTER] to copy the level code to your clipboard. Press CTRL+V in a text editor and share it with friends!", 0, 742, Brushes.Orange);
+                Program.s.render("Press [S] to copy the level code to your clipboard. Press CTRL+V in a text editor and share it with friends!", 0, 742, Brushes.Orange);
             
             //render the resources list
             Program.s.render("Resources Available:", 672, 0, Brushes.Orange);
@@ -239,12 +245,22 @@ namespace RUINS
                     keyDown[i] = true;
             }
             
-            if (Program.s.readKeyDown(Keys.Enter))
+            if (Program.s.readKeyDown(Keys.S))
             {
                 //submit the level to Gameplay
                 Gameplay.physicsObjects.Clear();
                 Gameplay.initGameplay(map);
                 Program.currentScreen = 1;
+                if(customMap)
+                {
+                    isCopied = false;
+                    Thread copyThread = new Thread(new ThreadStart(copyToClipboard));
+                    copyThread.SetApartmentState(ApartmentState.STA);
+                    copyThread.Start();
+                    if (isCopied)
+                        copyThread.Abort();
+                    MessageBox.Show("Level code copied to Clipboard!");
+                }
             }
 
             if (Program.s.keyUp())
@@ -284,6 +300,91 @@ namespace RUINS
                 }
             }
 
+        }
+
+        public static void copyToClipboard()
+        {
+            Clipboard.SetText(generateLevelCode());
+            isCopied = true;
+        }
+
+        public static void getFromClipboard()
+        {
+            bool shouldLoop = true;
+            IDataObject clipboardData = Clipboard.GetDataObject();
+
+            while (shouldLoop)
+            {
+                if (clipboardData != null)
+                {
+                    if (clipboardData.GetDataPresent(DataFormats.Text))
+                    {
+                        pastedString = Clipboard.GetData(DataFormats.Text).ToString();
+                        shouldLoop = false;
+                    }
+                }
+            }
+
+            MessageBox.Show(pastedString);
+            
+        }
+
+        public static void initWithCustomMap()
+        {
+            Thread pasteThread = new Thread(new ThreadStart(getFromClipboard));
+            pasteThread.SetApartmentState(ApartmentState.STA);
+            pasteThread.Start();
+            initMap("CUSTOM");
+            MessageBox.Show("pasted: " + pastedString);
+            map = loadLevelCode(pastedString);
+            Console.WriteLine("pasted successfully");
+            for(int i = 0; i < 20; i++)
+            {
+                for(int j = 0; j < 20; j++)
+                {
+                    if (map[i, j] != 0)
+                        presetMap[i, j] = true;
+                }
+            }
+        }
+
+        public static string generateLevelCode()
+        {
+            string tempLevelCode = "";
+
+            //generate the code
+            for(int i = 0; i < 20; i++)
+            {
+                for(int j = 0; j < 20; j++)
+                {
+                    tempLevelCode += map[i, j].ToString();
+                    tempLevelCode += ".";
+                } 
+            }
+
+            return tempLevelCode;
+        }
+
+        public static int[,] loadLevelCode(string levelCode)
+        {
+            int[,] generatedMap = new int[20, 20];
+
+            int charPosition = 0;
+
+            for(int i = 0; i < 20; i++)
+            {
+                for(int j = 0; j < 20; j++)
+                {
+                    if (charPosition < levelCode.Length)
+                    {
+                        generatedMap[i, j] = Convert.ToInt32(levelCode.Substring(charPosition, 1));
+                        Console.WriteLine(levelCode.Substring(charPosition, 1));
+                    }
+                    charPosition++;
+                }
+            }
+
+            return generatedMap;
         }
 
     }

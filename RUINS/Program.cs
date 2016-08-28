@@ -18,7 +18,7 @@ namespace RUINS
         public static Game g;
 
         //keep track of what screen we're on
-        public static int currentScreen = 2; //0 = menu, 1 = game, 2 = editor, 3 = results screen
+        public static int currentScreen = 0; //0 = menu, 1 = game, 2 = editor, 3 = results screen
 
         //graphics
         //NOTE: SPRING IS TEMPORARY
@@ -35,7 +35,7 @@ namespace RUINS
 
         public static int keyPressCooldown;
         public static int cooldownLength = 30;
-
+        
         static void Main(string[] args)
         {
             w = new Window(800, 800, "RUINS - Ludum Dare 36 entry");
@@ -56,8 +56,7 @@ namespace RUINS
             spring = new Prop(new Bitmap(prefix + "spring.png"), 32, 32);
             goal = new Prop(new Bitmap(prefix + "goal.png"), 32, 32);
 
-            //MainMenu.initMenu();
-            LevelEditor.initMap("level1");
+            MainMenu.initMenu();
 
             g.runGame();
         }

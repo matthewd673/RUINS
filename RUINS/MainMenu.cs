@@ -14,11 +14,14 @@ namespace RUINS
 
         public static Prop logo;
         public static Prop levelEditorButton;
+        public static Prop customLevelButton;
         public static Prop leftButton;
         public static Prop rightButton;
         public static Prop defaultCard;
         public static Prop level1Card;
         public static Prop level2Card;
+        public static Prop level3Card;
+        public static Prop level4Card;
 
         //yes its sloppy
         //no I'm not using an array again
@@ -26,9 +29,10 @@ namespace RUINS
         public static bool rightDown;
         public static bool enterDown;
         public static bool oneDown;
+        public static bool twoDown;
 
         public static int currentCard = 0;
-        public static int maxCards = 2;
+        public static int maxCards = 4;
 
         public static void initMenu()
         {
@@ -36,11 +40,14 @@ namespace RUINS
             string prefix = Environment.CurrentDirectory + @"\res\";
             logo = new Prop(new Bitmap(prefix + "logo.png"));
             levelEditorButton = new Prop(new Bitmap(prefix + "level-editor-button.png"), 350, 80);
+            customLevelButton = new Prop(new Bitmap(prefix + "custom-level-button.png"), 350, 80);
             leftButton = new Prop(new Bitmap(prefix + "left-arrows.png"), 64, 64);
             rightButton = new Prop(new Bitmap(prefix + "right-arrows.png"), 64, 64);
             defaultCard = new Prop(new Bitmap(prefix + "default-card.png"), 200, 400);
             level1Card = new Prop(new Bitmap(prefix + "level1-card.png"), 200, 400);
             level2Card = new Prop(new Bitmap(prefix + "level2-card.png"), 200, 400);
+            level3Card = new Prop(new Bitmap(prefix + "level3-card.png"), 200, 400);
+            level4Card = new Prop(new Bitmap(prefix + "level4-card.png"), 200, 400);
         }
 
         public static void menu()
@@ -48,7 +55,8 @@ namespace RUINS
             Program.s.render(logo, 250, 20);
             Program.s.render(leftButton, 200, 400);
             Program.s.render(rightButton, 525, 400);
-            Program.s.render(levelEditorButton, 225, 650);
+            Program.s.render(levelEditorButton, 10, 650);
+            Program.s.render(customLevelButton, 425, 650);
             Program.s.render(Program.keyPressCooldown.ToString(), 0, 0, Brushes.White);
 
             switch(currentCard)
@@ -59,6 +67,14 @@ namespace RUINS
 
                 case 1:
                     Program.s.render(level2Card, 300, 230);
+                    break;
+
+                case 2:
+                    Program.s.render(level3Card, 300, 230);
+                    break;
+
+                case 3:
+                    Program.s.render(level4Card, 300, 230);
                     break;
 
                 default:
@@ -106,6 +122,16 @@ namespace RUINS
             {
                 oneDown = false;
             }
+            
+            if (Program.s.readKeyDown(Keys.D2) && Program.keyPressCooldown == 0)
+            {
+                Program.keyPressCooldown = Program.cooldownLength;
+                twoDown = true;
+            }
+            else
+            {
+                twoDown = false;
+            }
 
             if (Program.s.keyUp())
             {
@@ -113,20 +139,21 @@ namespace RUINS
                 rightDown = false;
                 enterDown = false;
                 oneDown = false;
+                twoDown = false;
                 Program.keyPressCooldown = 0;
             }
 
             if(leftDown)
             {
-                currentCard++;
-                if (currentCard == maxCards)
-                    currentCard = 0;
-            }
-            if (rightDown)
-            {
                 currentCard--;
                 if (currentCard == -1)
                     currentCard = maxCards - 1;
+            }
+            if (rightDown)
+            {
+                currentCard++;
+                if (currentCard == maxCards)
+                    currentCard = 0;
             }
 
             if (enterDown)
@@ -139,6 +166,12 @@ namespace RUINS
             {
                 Program.currentScreen = 2;
                 LevelEditor.initMap("CUSTOM");
+            }
+
+            if (twoDown)
+            {
+                Program.currentScreen = 2;
+                LevelEditor.initWithCustomMap();
             }
         }
 
