@@ -141,18 +141,6 @@ namespace RUINS
             }
             */
 
-            //reactive collision detection
-            for(int i = 0; i < Gameplay.physicsObjects.Count; i++)
-            {
-                PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[i];
-                if(objectRect.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
-                {
-                    //x = lastX;
-                    //y = lastY;
-                    //Console.WriteLine("moved back!");
-                }
-            }
-
             /*
              * basic physics checking
              */
@@ -194,10 +182,10 @@ namespace RUINS
                                 shouldFall = true;
                             }
                             additionalWeight = 0;
-
                             break;
+
                         case 4:
-                            if(type == 0 || type == 1 || type == 3)
+                            if(type == 0 || type == 1)
                                 shouldDestroy = true;
                             break;
                         case 5:
@@ -236,7 +224,7 @@ namespace RUINS
                 for(int i = 0; i <= (weight + (int)additionalWeight); i++)
                 {
                     Rect future = new Rect(x, y++, 32, 32);
-                    Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Yellow);
+                    //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Yellow);
                     bool safeMove = true;
                     for(int j = 0; j < Gameplay.physicsObjects.Count; j++)
                     {
@@ -290,7 +278,7 @@ namespace RUINS
                                     shouldRoll = true;
                                     rollAmount = 0;
                                     rollDirection = false;
-                                    x += 16;
+                                    x -= 16;
                                     break;
 
                                 case 6:
@@ -339,7 +327,7 @@ namespace RUINS
                     {
                         //going left
                         Rect future = new Rect(x--, y, 32, 32);
-                        Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
+                        //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
                         bool safeMove = true;
                         for (int j = 0; j < Gameplay.physicsObjects.Count; j++)
                         {
@@ -355,7 +343,8 @@ namespace RUINS
                                         if (type == 3)
                                             shouldDestroy = true;
                                         shouldRoll = false;
-                                        x = placeholder.x + 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x + 33;
                                         break;
 
                                     case 1:
@@ -364,14 +353,16 @@ namespace RUINS
                                         if (type == 3)
                                             shouldDestroy = true;
                                         shouldRoll = false;
-                                        x = placeholder.x + 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x + 33;
                                         break;
 
                                     case 2:
                                         if (type == 3)
                                             shouldDestroy = true;
                                         shouldRoll = false;
-                                        x = placeholder.x + 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x + 33;
                                         break;
 
                                     case 3:
@@ -381,7 +372,8 @@ namespace RUINS
                                             shouldFall = true;
                                         }
                                         additionalWeight = 0;
-                                        x = placeholder.x + 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x + 33;
                                         break;
 
                                     case 4:
@@ -395,7 +387,7 @@ namespace RUINS
                                         shouldRoll = true;
                                         rollAmount = 0;
                                         rollDirection = false;
-                                        x += 16;
+                                        x -= 16;
                                         break;
 
                                     case 6:
@@ -432,7 +424,7 @@ namespace RUINS
                     {
                         //going right
                         Rect future = new Rect(x + i, y, 32, 32);
-                        Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
+                        //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
                         bool safeMove = true;
                         for (int j = 0; j < Gameplay.physicsObjects.Count; j++)
                         {
@@ -449,7 +441,8 @@ namespace RUINS
                                         if (type == 3)
                                             shouldDestroy = true;
                                         shouldRoll = false;
-                                        x = placeholder.x - 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x - 33;
                                         break;
 
                                     case 1:
@@ -458,14 +451,16 @@ namespace RUINS
                                         if (type == 3)
                                             shouldDestroy = true;
                                         shouldFall = false;
-                                        x = placeholder.x - 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x - 33;
                                         break;
 
                                     case 2:
                                         if (type == 3)
                                             shouldDestroy = true;
                                         shouldRoll = false;
-                                        x = placeholder.x - 33;
+                                        if(y > placeholder.y) //its not on top of the platform
+                                            x = placeholder.x - 33;
                                         break;
 
                                     case 3:
@@ -476,7 +471,8 @@ namespace RUINS
                                         }
                                         additionalWeight = 0;
                                         shouldRoll = false;
-                                        x = placeholder.x - 33;
+                                        if (y > placeholder.y)
+                                            x = placeholder.x - 33;
                                         break;
 
                                     case 4:
@@ -543,8 +539,8 @@ namespace RUINS
             objectRect.x = x;
             objectRect.y = y;
 
-            if (victory == true)
-                Program.currentScreen = 3;
+            //if (victory == true)
+                //Program.currentScreen = 3;
         }
 
     }

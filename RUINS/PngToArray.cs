@@ -32,6 +32,12 @@ namespace RUINS
                     //100, 100, 100 = left ramp
                     //150, 150, 150 = right ramp
                     //0, 0, 255 = objective rock
+                    //255, 0, 255 = off-limits
+
+                    if (currentPixel.R == 255 && currentPixel.G == 0 && currentPixel.B == 255)
+                    {
+                        tempArray[i, j] = -1;
+                    }
 
                     if (currentPixel.R == 0 && currentPixel.G == 0 && currentPixel.B == 255)
                     {

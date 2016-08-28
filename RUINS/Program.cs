@@ -41,7 +41,7 @@ namespace RUINS
             w = new Window(800, 800, "RUINS - Ludum Dare 36 entry");
             w.gamewindow.MaximizeBox = false;
             s = new Scene(w);
-            g = new Game(w, s, new Action(update), 30);
+            g = new Game(w, s, new Action(update));
 
             //initialize graphics
             string prefix = Environment.CurrentDirectory + @"\res\";

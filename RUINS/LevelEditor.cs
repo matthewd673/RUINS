@@ -21,6 +21,13 @@ namespace RUINS
         public static bool[,] presetMap = new bool[20, 20];
         public static ArrayList clickTiles = new ArrayList();
 
+        //resource lists for all the different levels
+        //custom levels can't have their own resource lists
+        public static int[,] level1Resources = new int[10, 1];
+        public static int[,] level2Resources = new int[10, 1];
+        public static int[,] level3Resources = new int[10, 1];
+        public static int[,] level4Resources = new int[10, 1];
+        
         public static bool customMap;
 
         //for input
@@ -31,7 +38,7 @@ namespace RUINS
 
         //the amount of each resource available
         //this will be different between planing mode and level edit mode
-        public static int[,] resources = new int[10, 5];
+        public static int[,] resources = new int[10, 1];
 
         public static bool isCopied = false;
 
@@ -67,6 +74,44 @@ namespace RUINS
             for(int i = 0; i < 9; i++)
             {
                 resources[i, 0] = 5;
+            }
+
+            //this is very much a work in progress
+            level1Resources[6, 0] = 1;
+
+            level2Resources[5, 0] = 1;
+            level2Resources[1, 0] = 1;
+
+            level3Resources[6, 0] = 2;
+            level3Resources[4, 0] = 2;
+            level3Resources[1, 0] = 1;
+
+            level4Resources[0, 0] = 1;
+            level4Resources[5, 0] = 1;
+            level4Resources[6, 0] = 1;
+
+            //load in resource count depending on map
+            switch(mapName)
+            {
+                case "level1":
+                    resources = level1Resources;
+                    break;
+
+                case "level2":
+                    resources = level2Resources;
+                    break;
+
+                case "level3":
+                    resources = level3Resources;
+                    break;
+
+                case "level4":
+                    resources = level4Resources;
+                    break;
+
+                default:
+                    MessageBox.Show("We couldn't find a resource list for this level, so have 5 of everything!");
+                    break;
             }
         }
 
@@ -271,15 +316,15 @@ namespace RUINS
                 }
             }
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 9; i++)
             {
                 if (keyDown[i])
                 {
-                    if (i < 9)
+                    if (blockX != -1 && blockY != -1)
                     {
-                        if (blockX != -1 && blockY != -1)
+                        if (i > 0)
                         {
-                            if (resources[i, 0] > 0 && presetMap[blockX, blockY] != true)
+                            if (resources[i - 1, 0] > 0 && presetMap[blockX, blockY] != true)
                             {
                                 //place the thing
                                 bool alreadyPlaced = false;
@@ -287,12 +332,15 @@ namespace RUINS
                                     alreadyPlaced = true;
                                 map[blockX, blockY] = i;
                                 if (!customMap && !alreadyPlaced)
-                                    resources[i, 0]--;
+                                    resources[i - 1, 0]--;
                             }
-                            if (keyDown[0])
+                        }
+                        if (keyDown[0])
+                        {
+                            //deletion tool
+                            if (map[blockX, blockY] != 0)
                             {
-                                //deletion tool
-                                resources[map[blockX, blockY], 0]++;
+                                resources[map[blockX, blockY] - 1, 0]++;
                                 map[blockX, blockY] = 0;
                             }
                         }
