@@ -209,7 +209,7 @@ namespace RUINS
                         case 7:
                             if (type == 0)
                                 victory = true;
-                            else if (type != 0)
+                            else if (type != 0 && type != 1)
                                 shouldDestroy = true;
                             break;
                     }
@@ -293,7 +293,7 @@ namespace RUINS
                                 case 7:
                                     if (type == 0)
                                         victory = true;
-                                    else if (type != 0)
+                                    else if (type != 0 && type != 1)
                                         shouldDestroy = true;
                                     break;
                             }
@@ -402,7 +402,7 @@ namespace RUINS
                                     case 7:
                                         if (type == 0)
                                             victory = true;
-                                        else if (type != 0)
+                                        else if (type != 0 && type != 1)
                                             shouldDestroy = true;
                                         break;
                                 }
@@ -501,7 +501,7 @@ namespace RUINS
                                     case 7:
                                         if (type == 0)
                                             victory = true;
-                                        else if (type != 0)
+                                        else if (type != 0 && type != 1)
                                             shouldDestroy = true;
                                         break;
                                 }
@@ -541,10 +541,7 @@ namespace RUINS
 
             if (victory)
             {
-                Program.currentScreen = 3;
-                Results.displayResults(true);
-                while (Results.shouldDisplay)
-                    Results.displayResults(true);
+                Program.currentScreen = 0;
                 victory = false;
             }
         }

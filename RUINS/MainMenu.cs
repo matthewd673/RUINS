@@ -49,6 +49,7 @@ namespace RUINS
             level2Card = new Prop(new Bitmap(prefix + "level2-card.png"), 200, 400);
             level3Card = new Prop(new Bitmap(prefix + "level3-card.png"), 200, 400);
             level4Card = new Prop(new Bitmap(prefix + "level4-card.png"), 200, 400);
+            level5Card = new Prop(new Bitmap(prefix + "level5-card.png"), 200, 400);
         }
 
         public static void menu()
@@ -76,6 +77,10 @@ namespace RUINS
 
                 case 3:
                     Program.s.render(level4Card, 300, 230);
+                    break;
+
+                case 4:
+                    Program.s.render(level5Card, 300, 230);
                     break;
 
                 default:
