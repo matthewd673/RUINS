@@ -57,6 +57,7 @@ namespace RUINS
             goal = new Prop(new Bitmap(prefix + "goal.png"), 32, 32);
 
             MainMenu.initMenu();
+            Results.initResults();
 
             g.runGame();
         }
@@ -74,9 +75,6 @@ namespace RUINS
 
             if (currentScreen == 2)
                 LevelEditor.edit();
-
-            if (currentScreen == 3)
-                Results.displayResults();
         }
     }
 }

@@ -535,12 +535,18 @@ namespace RUINS
             }
             if(y > 640)
                 shouldDestroy = true;
-
+            
             objectRect.x = x;
             objectRect.y = y;
 
-            //if (victory == true)
-                //Program.currentScreen = 3;
+            if (victory)
+            {
+                Program.currentScreen = 3;
+                Results.displayResults(true);
+                while (Results.shouldDisplay)
+                    Results.displayResults(true);
+                victory = false;
+            }
         }
 
     }

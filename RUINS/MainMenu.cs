@@ -22,6 +22,7 @@ namespace RUINS
         public static Prop level2Card;
         public static Prop level3Card;
         public static Prop level4Card;
+        public static Prop level5Card;
 
         //yes its sloppy
         //no I'm not using an array again
@@ -32,7 +33,7 @@ namespace RUINS
         public static bool twoDown;
 
         public static int currentCard = 0;
-        public static int maxCards = 4;
+        public static int maxCards = 5;
 
         public static void initMenu()
         {

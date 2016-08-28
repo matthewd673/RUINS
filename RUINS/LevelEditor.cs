@@ -27,8 +27,11 @@ namespace RUINS
         public static int[,] level2Resources = new int[10, 1];
         public static int[,] level3Resources = new int[10, 1];
         public static int[,] level4Resources = new int[10, 1];
+        public static int[,] level5Resources = new int[10, 1];
         
         public static bool customMap;
+
+        public static bool copyDialog = true;
 
         //for input
         //yes i know this is a clumsy method
@@ -90,6 +93,9 @@ namespace RUINS
             level4Resources[5, 0] = 1;
             level4Resources[6, 0] = 1;
 
+            level5Resources[5, 0] = 1;
+            level5Resources[6, 0] = 3;
+
             //load in resource count depending on map
             switch(mapName)
             {
@@ -109,8 +115,8 @@ namespace RUINS
                     resources = level4Resources;
                     break;
 
-                default:
-                    MessageBox.Show("We couldn't find a resource list for this level, so have 5 of everything!");
+                case "level5":
+                    resources = level5Resources;
                     break;
             }
         }
@@ -304,7 +310,9 @@ namespace RUINS
                     copyThread.Start();
                     if (isCopied)
                         copyThread.Abort();
-                    MessageBox.Show("Level code copied to Clipboard!");
+                    if(copyDialog)
+                        MessageBox.Show("Level code copied to Clipboard!");
+                    copyDialog = true;
                 }
             }
 
@@ -324,12 +332,17 @@ namespace RUINS
                     {
                         if (i > 0)
                         {
-                            if (resources[i - 1, 0] > 0 && presetMap[blockX, blockY] != true)
+                            if (resources[i - 1, 0] > 0 && !presetMap[blockX, blockY])
                             {
                                 //place the thing
                                 bool alreadyPlaced = false;
+                                int existingTileId = 0;
                                 if (map[blockX, blockY] == i)
                                     alreadyPlaced = true;
+                                else if (map[blockX, blockY] != 0)
+                                    existingTileId = map[blockX, blockY];
+                                if (existingTileId != i && existingTileId != 0)
+                                    resources[existingTileId - 1, 0]++;
                                 map[blockX, blockY] = i;
                                 if (!customMap && !alreadyPlaced)
                                     resources[i - 1, 0]--;
@@ -358,6 +371,7 @@ namespace RUINS
 
         public static void getFromClipboard()
         {
+            /*
             bool shouldLoop = true;
             IDataObject clipboardData = Clipboard.GetDataObject();
 
@@ -372,19 +386,21 @@ namespace RUINS
                     }
                 }
             }
+            */
 
-            MessageBox.Show(pastedString);
-            
+            string pasteCode = Clipboard.GetText();
+            map = loadLevelCode(pasteCode);
+
         }
 
         public static void initWithCustomMap()
         {
+            initMap("CUSTOM");
             Thread pasteThread = new Thread(new ThreadStart(getFromClipboard));
             pasteThread.SetApartmentState(ApartmentState.STA);
             pasteThread.Start();
-            initMap("CUSTOM");
-            MessageBox.Show("pasted: " + pastedString);
-            map = loadLevelCode(pastedString);
+            //MessageBox.Show("pasted: " + pastedString);
+            //map = loadLevelCode(pastedString);
             Console.WriteLine("pasted successfully");
             for(int i = 0; i < 20; i++)
             {
@@ -406,7 +422,6 @@ namespace RUINS
                 for(int j = 0; j < 20; j++)
                 {
                     tempLevelCode += map[i, j].ToString();
-                    tempLevelCode += ".";
                 } 
             }
 
@@ -419,18 +434,21 @@ namespace RUINS
 
             int charPosition = 0;
 
+            char[] parsedLevel = levelCode.ToCharArray();
+
             for(int i = 0; i < 20; i++)
             {
                 for(int j = 0; j < 20; j++)
                 {
-                    if (charPosition < levelCode.Length)
-                    {
-                        generatedMap[i, j] = Convert.ToInt32(levelCode.Substring(charPosition, 1));
-                        Console.WriteLine(levelCode.Substring(charPosition, 1));
-                    }
+                    string currentCharacter = parsedLevel[charPosition].ToString();
+                    Console.WriteLine(currentCharacter);
+                    int currentMapValue = Convert.ToInt32(currentCharacter);
+                    generatedMap[i, j] = currentMapValue;
                     charPosition++;
                 }
             }
+
+            copyDialog = false;
 
             return generatedMap;
         }
