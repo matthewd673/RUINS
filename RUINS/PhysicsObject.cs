@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using neon2d;
 using neon2d.Physics;
 
 namespace RUINS
@@ -27,11 +29,16 @@ namespace RUINS
         public int rollAmount; //how much its rolled
         public int maxRollAmount = 32; //how far it can roll on one push
 
+        public bool canFall = true;
+        public bool canRoll = true;
+
         //for more realistic gravity
         public double additionalWeight = 0;
 
         //create a rect for each object
         public Rect objectRect;
+
+        public bool victory = false;
 
         //TYPES:
         //0 = objective rock
@@ -64,14 +71,16 @@ namespace RUINS
                 case 2:
                     //platform (can't move)
                     this.weight = 0; //(never falls)
-                    shouldFall = false;
+                    canFall = false;
+                    canRoll = false;
                     maxRollAmount = 0; //just for safety
                     break;
 
                 case 3:
                     //falling platform (moves sometimes)
                     this.weight = 8;
-                    shouldFall = false;
+                    canFall = false;
+                    canRoll = false;
                     maxRollAmount = 0;
                     break;
 
@@ -84,20 +93,23 @@ namespace RUINS
                 case 5:
                     //left ramp
                     this.weight = 0;
-                    shouldFall = false;
+                    canFall = false;
+                    canRoll = false;
                     maxRollAmount = 0;
                     break;
 
                 case 6:
                     //right ramp
                     this.weight = 0;
-                    shouldFall = false;
+                    canFall = false;
+                    canRoll = false;
                     maxRollAmount = 0;
                     break;
 
                 case 7:
                     this.weight = 0;
-                    shouldFall = false;
+                    canFall = false;
+                    canRoll = false;
                     maxRollAmount = 0;
                     break;
 
@@ -107,269 +119,173 @@ namespace RUINS
 
         public void update()
         {
-            /*NOTE:
-             * These physics are mediocre at best,
-             * sloppy and fairly bad at worst.
-             * Please don't use this in your own projects.
-             */
             //check collisions
             //but only for certain physicsobjects
             //THE LAVA DOES NOT DETECT COLLISIONS WITH ROCKS
             //the lava detects collisions with platforms, the rocks detect collisions with lava
-            if (type == 0 || type == 1 || type == 3 || type == 4)
+
+            //NEW AND IMPROVED PHYSICS:
+            //this is very much a work in progress
+            if(shouldFall && canFall)
             {
-                for (int i = 0; i < Gameplay.physicsObjects.Count; i++)
+                for(int i = 0; i <= (weight + (int)additionalWeight); i++)
                 {
-                    //check the type
-                    //mostly for safety purposes
-                    if (Gameplay.physicsObjects[i].GetType() == typeof(PhysicsObject))
+                    Rect future = new Rect(x, y + i, 32, 32);
+                    //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Yellow);
+                    bool safeMove = true;
+                    for(int j = 0; j < Gameplay.physicsObjects.Count; j++)
                     {
-                        PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[i];
-                        if (placeholder.objectRect != objectRect)
+                        PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[j];
+                        if(future.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
                         {
-                            if (objectRect.intersects(placeholder.objectRect))
+                            safeMove = false;
+                            switch (placeholder.type)
                             {
-                                Console.WriteLine("collision!");
-                                //they have collided!
-                                switch (placeholder.type)
+                                case 3:
+                                    placeholder.triggered = true;
+                                    additionalWeight = 0;
+                                    shouldFall = true;
+                                    safeMove = true;
+                                    break;
+                                case 4:
+                                    shouldDestroy = true;
+                                    break;
+                                case 5:
+                                    shouldRoll = true;
+                                    rollAmount = 0;
+                                    rollDirection = false;
+                                    x += 16;
+                                    safeMove = true;
+                                    break;
+
+                                case 6:
+                                    shouldRoll = true;
+                                    rollAmount = 0;
+                                    rollDirection = true;
+                                    x += 16;
+                                    safeMove = true;
+                                    break;
+
+                                case 7:
+                                    if(type == 0)
+                                        victory = true;
+                                    break;
+                            }
+                            
+                        }
+                    }
+                    if(safeMove)
+                    {
+                        y++;
+                    }
+                    else
+                    {
+                        y = (int)future.y - 1;
+                        shouldFall = false;
+                        additionalWeight = 0;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldRoll && canRoll)
+            {
+                for (int i = 0; i <= (13 - weight); i++)
+                {
+                    if (!rollDirection)
+                    {
+                        //going left
+                        Rect future = new Rect(x - 1, y, 32, 32);
+                        //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
+                        bool safeMove = true;
+                        for (int j = 0; j < Gameplay.physicsObjects.Count; j++)
+                        {
+                            PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[j];
+                            if (future.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
+                            {
+                                safeMove = false;
+                                switch(placeholder.type)
                                 {
-                                    case 0:
-                                        //its the objective rock
-                                        shouldFall = false;
-                                        /*
-                                        if(type == 3)
-                                        {
-                                            shouldDestroy = true;
-                                        }
-                                        */
-                                        if(shouldRoll)
-                                        {
-                                            shouldRoll = false;
-                                            rollAmount = 0;
-                                            if(!rollDirection)
-                                            {
-                                                //rolling left
-                                                x = placeholder.x + 32;
-                                            }
-                                            else
-                                            {
-                                                //rolling right
-                                                x = placeholder.x - 32;
-                                            }
-                                        }
-                                        break;
-
-                                    case 1:
-                                        //its another rock
-                                        shouldFall = false;
-                                        if (shouldRoll)
-                                        {
-                                            shouldRoll = false;
-                                            rollAmount = 0;
-                                            if (!rollDirection)
-                                            {
-                                                //rolling left
-                                                x = placeholder.x + 32;
-                                            }
-                                            else
-                                            {
-                                                //rolling right
-                                                x = placeholder.x - 32;
-                                            }
-                                        }
-                                        break;
-
-                                    case 2:
-                                        //Good enough
-                                        shouldFall = false;
-                                        if (placeholder.y - y < 8)
-                                        {
-                                            shouldRoll = false;
-                                            if (!rollDirection)
-                                            {
-                                                //rolling left
-                                                x = placeholder.x + 32;
-                                            }
-                                            else
-                                            {
-                                                x = placeholder.x - 32;
-                                            }
-                                        }
-                                        if (Gameplay.currentMap[(x / 32) + 1, (y / 32)] == 0)
-                                        {
-                                            if(x > placeholder.x + 31)
-                                            {
-                                                shouldFall = true;
-                                            }
-                                        }
-                                        if(Gameplay.currentMap[(x / 32) - 1, (y / 32)] == 0)
-                                        {
-                                            if(x < placeholder.x - 3)
-                                            {
-                                                shouldFall = true;
-                                            }
-                                        }
-
-                                        if(!shouldFall)
-                                        {
-                                            y = placeholder.y - 32;
-                                        }
-
-                                        if(type == 3)
-                                        {
-                                            //falling platform
-                                            shouldDestroy = true;
-                                        }
-                                        
-                                        break;
-
-                                    case 3:
-                                        //its a falling platform
-                                        placeholder.triggered = true;
-                                        if (placeholder.y - y < 8)
-                                        {
-                                            shouldRoll = false;
-                                            if (!rollDirection)
-                                            {
-                                                //rolling left
-                                                x = placeholder.x + 32;
-                                            }
-                                            else
-                                            {
-                                                x = placeholder.x - 32;
-                                            }
-                                        }
-                                        break;
-
                                     case 4:
-                                        //its lava
-                                        if(type == 0 || type == 1 || type == 3)
-                                        {
-                                            shouldDestroy = true;
-                                        }
+                                        shouldDestroy = true;
                                         break;
-
                                     case 5:
-                                        //its a left ramp
-                                        if(type == 0 || type == 1)
-                                        {
-                                            if (shouldFall)
-                                            {
-                                                rollAmount = 0;
-                                                shouldRoll = true;
-                                                rollDirection = false;
-                                            }
-                                        }
-                                        if(type == 3)
-                                        {
-                                            shouldDestroy = true;
-                                        }
-                                        if(type == 4)
-                                        {
-                                            //push it to the block to the left
-                                            if (shouldFall)
-                                            {
-                                                rollAmount = 0;
-                                                shouldRoll = true;
-                                                rollDirection = false;
-                                            }
-                                        }
+                                        if(shouldFall)
+                                            safeMove = true;
+                                        rollAmount = 0;
                                         break;
 
                                     case 6:
-                                        //its a right ramp
-                                        if(type == 0 || type == 1)
-                                        {
-                                            if (shouldFall)
-                                            {
-                                                rollAmount = 0;
-                                                shouldRoll = true;
-                                                rollDirection = true;
-                                            }
-                                        }
-                                        if(type == 3)
-                                        {
-                                            shouldDestroy = true;
-                                        }
-                                        if(type == 4)
-                                        {
-                                            //push to the right
-                                            if (shouldFall)
-                                            {
-                                                rollAmount = 0;
-                                                shouldRoll = true;
-                                                rollDirection = true;
-                                            }
-                                        }
+                                        if(shouldFall)
+                                            safeMove = true;
+                                        rollAmount = 0;
                                         break;
 
                                     case 7:
-                                        //its the goal!
-                                        if (type == 0)
-                                        {
-                                            //you win!
-                                            Program.s.render("YOU WIN", 100, 100, System.Drawing.Brushes.Yellow);
-                                            Console.WriteLine("VICTORY!!!!!");
-                                            shouldFall = false;
-                                        }
-                                        else
-                                        {
-                                            shouldDestroy = true;
-                                        }
+                                        if(type == 0)
+                                            victory = true;
                                         break;
+                                        
                                 }
                             }
+                        }
+                        if (safeMove)
+                        {
+                            x--;
+                        }
+                        else
+                        {
+                            x = (int)future.x + 1;
+                            shouldRoll = false;
+                        }
+                    }
+                    else
+                    {
+                        //going right
+                        Rect future = new Rect(x + 1, y, 32, 32);
+                        //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
+                        bool safeMove = true;
+                        for (int j = 0; j < Gameplay.physicsObjects.Count; j++)
+                        {
+                            PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[j];
+                            if (future.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
+                            {
+                                Console.WriteLine(type + "->" + placeholder.type);
+                                safeMove = false;
+                            }
+                        }
+                        if (safeMove)
+                        {
+                            x++;
+                        }
+                        else
+                        {
+                            x = (int)future.x - 1;
+                            shouldRoll = false;
                         }
                     }
                 }
             }
-            //this is SUPER primitive
-            if(triggered)
+
+            if (triggered)
             {
                 switch(type)
                 {
                     case 3:
+                        canFall = true;
                         shouldFall = true;
+                        y += 8;
                         break;
                 }
             }
-            if(shouldFall)
-                y += (weight + (int)additionalWeight);
             if(y > 640)
                 shouldDestroy = true;
 
-            if(shouldRoll)
-            {
-                if(!rollDirection)
-                {
-                    //roll left
-                    if(rollAmount < maxRollAmount)
-                    {
-                        rollAmount += 13 - weight;
-                        x -= (13 - weight);
-                    }
-                    else
-                    {
-                        shouldRoll = false;
-                    }
-                }
-                else
-                {
-                    //roll right
-                    if(rollAmount < maxRollAmount)
-                    {
-                        rollAmount += 13 - weight;
-                        x += (13 - weight);
-                    }
-                    else
-                    {
-                        shouldRoll = false;
-                    }
-                }
-            }
-
             objectRect.x = x;
             objectRect.y = y;
+
+            if (victory == true)
+                Program.currentScreen = 3;
         }
 
     }

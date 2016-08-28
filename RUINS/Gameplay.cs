@@ -81,15 +81,6 @@ namespace RUINS
         public static void play()
         {
             simulate();
-            for (int i = 0; i < Program.eventLog.Count; i++)
-            {
-                //pretty much the same as with PhysicsObjects
-                if (Program.eventLog[i].GetType() == typeof(Program.gameEvent))
-                {
-                    Program.gameEvent placeholder = (Program.gameEvent)Program.eventLog[i];
-                    Program.s.render(placeholder.eventString, 0, i * 12, Brushes.White);
-                }
-            }
         }
 
         public static void simulate()
@@ -116,7 +107,6 @@ namespace RUINS
                     if (placeholder.shouldDestroy)
                     {
                         physicsObjects.Remove(physicsObjects[i]);
-                        Program.addEvent("Object destroyed");
                     }
                     
                     //render PhysicsObjects
@@ -125,6 +115,7 @@ namespace RUINS
                         case 0:
                             //objective rock
                             Program.s.render(Program.objectiveRock, placeholder.x, placeholder.y);
+                            
                             break;
 
                         case 1:

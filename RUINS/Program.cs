@@ -18,7 +18,7 @@ namespace RUINS
         public static Game g;
 
         //keep track of what screen we're on
-        public static int currentScreen = 2; //0 = menu, 1 = game, 2 = editor
+        public static int currentScreen = 2; //0 = menu, 1 = game, 2 = editor, 3 = results screen
 
         //graphics
         //NOTE: SPRING IS TEMPORARY
@@ -33,14 +33,12 @@ namespace RUINS
         public static Prop spring;
         public static Prop goal;
 
-        public static ArrayList eventLog = new ArrayList();
-
         static void Main(string[] args)
         {
             w = new Window(800, 800, "RUINS - Ludum Dare 36 entry");
             w.gamewindow.MaximizeBox = false;
             s = new Scene(w);
-            g = new Game(w, s, new Action(update));
+            g = new Game(w, s, new Action(update), 30);
 
             //initialize graphics
             string prefix = Environment.CurrentDirectory + @"\res\";
@@ -55,8 +53,8 @@ namespace RUINS
             spring = new Prop(new Bitmap(prefix + "spring.png"), 32, 32);
             goal = new Prop(new Bitmap(prefix + "goal.png"), 32, 32);
 
-            LevelEditor.initMap("test-level");
-            Gameplay.initGameplay(PngToArray.createArray("level1"));
+            MainMenu.initMenu();
+            LevelEditor.initMap("level1");
 
             g.runGame();
         }
@@ -71,45 +69,9 @@ namespace RUINS
 
             if (currentScreen == 2)
                 LevelEditor.edit();
-        }
 
-        public struct gameEvent
-        {
-            public int weight;
-            public string eventString;
-            
-            public gameEvent(string eventString)
-            {
-                weight = 0;
-                this.eventString = eventString;
-            }
-        }
-
-        //this should be changed up later on
-        public static void addEvent(string eventString)
-        {
-            gameEvent ge = new gameEvent(eventString);
-            eventLog.Add(ge);
-            for (int i = 0; i < eventLog.Count; i++)
-            {
-                //safety
-                if (eventLog[i].GetType() == typeof(gameEvent))
-                {
-                    gameEvent placeholder = (gameEvent)eventLog[i];
-                    //move it down a notch
-                    if (placeholder.weight < 10)
-                    {
-                        placeholder.weight++;
-                        //save changes
-                        eventLog[i] = placeholder;
-                    }
-                    else
-                    {
-                        //remove it
-                        eventLog.Remove(eventLog[i]);
-                    }
-                }
-            }
+            if (currentScreen == 3)
+                Results.displayResults();
         }
     }
 }
