@@ -33,6 +33,9 @@ namespace RUINS
         public static Prop spring;
         public static Prop goal;
 
+        public static int keyPressCooldown;
+        public static int cooldownLength = 30;
+
         static void Main(string[] args)
         {
             w = new Window(800, 800, "RUINS - Ludum Dare 36 entry");
@@ -53,7 +56,7 @@ namespace RUINS
             spring = new Prop(new Bitmap(prefix + "spring.png"), 32, 32);
             goal = new Prop(new Bitmap(prefix + "goal.png"), 32, 32);
 
-            MainMenu.initMenu();
+            //MainMenu.initMenu();
             LevelEditor.initMap("level1");
 
             g.runGame();
@@ -61,6 +64,9 @@ namespace RUINS
 
         public static void update()
         {
+            keyPressCooldown--;
+            if (keyPressCooldown < 0)
+                keyPressCooldown = 0;
             if (currentScreen == 0)
                 MainMenu.menu();
 

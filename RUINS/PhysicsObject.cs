@@ -40,6 +40,9 @@ namespace RUINS
 
         public bool victory = false;
 
+        public int lastX = 0;
+        public int lastY = 0;
+
         //TYPES:
         //0 = objective rock
         //1 = rock
@@ -52,6 +55,9 @@ namespace RUINS
             this.width = width;
             this.height = height;
             this.type = type;
+
+            lastX = x;
+            lastY = y;
 
             //weight is determined based off type
             switch(this.type)
@@ -126,60 +132,197 @@ namespace RUINS
 
             //NEW AND IMPROVED PHYSICS:
             //this is very much a work in progress
-            if(shouldFall && canFall)
+
+            /*
+            if (fallCheckTime > 9)
+            {
+                shouldFall = true;
+                fallCheckTime = 0;
+            }
+            */
+
+            //reactive collision detection
+            for(int i = 0; i < Gameplay.physicsObjects.Count; i++)
+            {
+                PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[i];
+                if(objectRect.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
+                {
+                    //x = lastX;
+                    //y = lastY;
+                    //Console.WriteLine("moved back!");
+                }
+            }
+
+            /*
+             * basic physics checking
+             */
+            bool didCollide = false;
+            for (int i = 0; i < Gameplay.physicsObjects.Count; i++)
+            {
+                PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[i];
+                if(objectRect.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
+                {
+                    didCollide = true;
+
+                    switch (placeholder.type)
+                    {
+
+                        case 0:
+                            if (type == 4)
+                                placeholder.shouldDestroy = true;
+                            if (type == 3)
+                                shouldDestroy = true;
+                            break;
+
+                        case 1:
+                            if (type == 4)
+                                placeholder.shouldDestroy = true;
+                            if (type == 3)
+                                shouldDestroy = true;
+                            break;
+
+                        case 2:
+                            if (type == 3)
+                                shouldDestroy = true;
+                            shouldFall = false;
+                            break;
+
+                        case 3:
+                            if (type == 0 || type == 1)
+                            {
+                                placeholder.triggered = true;
+                                shouldFall = true;
+                            }
+                            additionalWeight = 0;
+
+                            break;
+                        case 4:
+                            if(type == 0 || type == 1 || type == 3)
+                                shouldDestroy = true;
+                            break;
+                        case 5:
+                            if (type == 3)
+                                shouldDestroy = true;
+                            shouldRoll = true;
+                            rollAmount = 0;
+                            rollDirection = false;
+                            x += 16;
+                            break;
+
+                        case 6:
+                            if (type == 3)
+                                shouldDestroy = true;
+                            shouldRoll = true;
+                            rollAmount = 0;
+                            rollDirection = true;
+                            x += 16;
+                            break;
+
+                        case 7:
+                            if (type == 0)
+                                victory = true;
+                            else if (type != 0)
+                                shouldDestroy = true;
+                            break;
+                    }
+
+                }
+            }
+            if (!didCollide && canFall)
+                shouldFall = true;
+
+            if (shouldFall && canFall)
             {
                 for(int i = 0; i <= (weight + (int)additionalWeight); i++)
                 {
-                    Rect future = new Rect(x, y + i, 32, 32);
-                    //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Yellow);
+                    Rect future = new Rect(x, y++, 32, 32);
+                    Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Yellow);
                     bool safeMove = true;
                     for(int j = 0; j < Gameplay.physicsObjects.Count; j++)
                     {
                         PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[j];
                         if(future.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
                         {
-                            safeMove = false;
                             switch (placeholder.type)
                             {
+
+                                case 0:
+                                    if (type == 4)
+                                        placeholder.shouldDestroy = true;
+                                    if (type == 3)
+                                        shouldDestroy = true;
+                                    shouldFall = false;
+                                    y = placeholder.y - 33;
+                                    break;
+
+                                case 1:
+                                    if (type == 4)
+                                        placeholder.shouldDestroy = true;
+                                    if (type == 3)
+                                        shouldDestroy = true;
+                                    shouldFall = false;
+                                    y = placeholder.y - 33;
+                                    break;
+
+                                case 2:
+                                    if (type == 3)
+                                        shouldDestroy = true;
+                                    shouldFall = false;
+                                    y = placeholder.y - 33;
+                                    break;
+
                                 case 3:
-                                    placeholder.triggered = true;
+                                    if (type == 0 || type == 1)
+                                    {
+                                        placeholder.triggered = true;
+                                        shouldFall = true;
+                                    }
                                     additionalWeight = 0;
-                                    shouldFall = true;
-                                    safeMove = true;
+
                                     break;
                                 case 4:
-                                    shouldDestroy = true;
+                                    if (type == 0 || type == 1 || type == 3)
+                                        shouldDestroy = true;
                                     break;
                                 case 5:
+                                    if (type == 3)
+                                        shouldDestroy = true;
                                     shouldRoll = true;
                                     rollAmount = 0;
                                     rollDirection = false;
                                     x += 16;
-                                    safeMove = true;
                                     break;
 
                                 case 6:
+                                    if (type == 3)
+                                        shouldDestroy = true;
                                     shouldRoll = true;
                                     rollAmount = 0;
                                     rollDirection = true;
                                     x += 16;
-                                    safeMove = true;
                                     break;
 
                                 case 7:
-                                    if(type == 0)
+                                    if (type == 0)
                                         victory = true;
+                                    else if (type != 0)
+                                        shouldDestroy = true;
                                     break;
                             }
-                            
+
+                            if (placeholder.shouldFall)
+                                shouldFall = true;
+
                         }
                     }
                     if(safeMove)
                     {
+                        lastY = y;
                         y++;
                     }
                     else
                     {
+                        lastY = y;
                         y = (int)future.y - 1;
                         shouldFall = false;
                         additionalWeight = 0;
@@ -195,46 +338,92 @@ namespace RUINS
                     if (!rollDirection)
                     {
                         //going left
-                        Rect future = new Rect(x - 1, y, 32, 32);
-                        //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
+                        Rect future = new Rect(x--, y, 32, 32);
+                        Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
                         bool safeMove = true;
                         for (int j = 0; j < Gameplay.physicsObjects.Count; j++)
                         {
                             PhysicsObject placeholder = (PhysicsObject)Gameplay.physicsObjects[j];
                             if (future.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
                             {
-                                safeMove = false;
-                                switch(placeholder.type)
+                                switch (placeholder.type)
                                 {
-                                    case 4:
-                                        shouldDestroy = true;
+
+                                    case 0:
+                                        if (type == 4)
+                                            placeholder.shouldDestroy = true;
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = false;
+                                        x = placeholder.x + 33;
                                         break;
+
+                                    case 1:
+                                        if (type == 4)
+                                            placeholder.shouldDestroy = true;
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = false;
+                                        x = placeholder.x + 33;
+                                        break;
+
+                                    case 2:
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = false;
+                                        x = placeholder.x + 33;
+                                        break;
+
+                                    case 3:
+                                        if (type == 0 || type == 1)
+                                        {
+                                            placeholder.triggered = true;
+                                            shouldFall = true;
+                                        }
+                                        additionalWeight = 0;
+                                        x = placeholder.x + 33;
+                                        break;
+
+                                    case 4:
+                                        if (type == 0 || type == 1 || type == 3)
+                                            shouldDestroy = true;
+                                        break;
+
                                     case 5:
-                                        if(shouldFall)
-                                            safeMove = true;
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = true;
                                         rollAmount = 0;
+                                        rollDirection = false;
+                                        x += 16;
                                         break;
 
                                     case 6:
-                                        if(shouldFall)
-                                            safeMove = true;
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = true;
                                         rollAmount = 0;
+                                        rollDirection = true;
+                                        x += 16;
                                         break;
 
                                     case 7:
-                                        if(type == 0)
+                                        if (type == 0)
                                             victory = true;
+                                        else if (type != 0)
+                                            shouldDestroy = true;
                                         break;
-                                        
                                 }
                             }
                         }
                         if (safeMove)
                         {
+                            lastX = x;
                             x--;
                         }
                         else
                         {
+                            lastX = x;
                             x = (int)future.x + 1;
                             shouldRoll = false;
                         }
@@ -242,8 +431,8 @@ namespace RUINS
                     else
                     {
                         //going right
-                        Rect future = new Rect(x + 1, y, 32, 32);
-                        //Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
+                        Rect future = new Rect(x + i, y, 32, 32);
+                        Program.s.render(new Shape.Rectangle(32, 32, false), (int)future.x, (int)future.y, 1, Brushes.Blue);
                         bool safeMove = true;
                         for (int j = 0; j < Gameplay.physicsObjects.Count; j++)
                         {
@@ -251,15 +440,85 @@ namespace RUINS
                             if (future.intersects(placeholder.objectRect) && placeholder.objectRect != objectRect)
                             {
                                 Console.WriteLine(type + "->" + placeholder.type);
-                                safeMove = false;
+                                switch (placeholder.type)
+                                {
+
+                                    case 0:
+                                        if (type == 4)
+                                            placeholder.shouldDestroy = true;
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = false;
+                                        x = placeholder.x - 33;
+                                        break;
+
+                                    case 1:
+                                        if (type == 4)
+                                            placeholder.shouldDestroy = true;
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldFall = false;
+                                        x = placeholder.x - 33;
+                                        break;
+
+                                    case 2:
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = false;
+                                        x = placeholder.x - 33;
+                                        break;
+
+                                    case 3:
+                                        if (type == 0 || type == 1)
+                                        {
+                                            placeholder.triggered = true;
+                                            shouldFall = true;
+                                        }
+                                        additionalWeight = 0;
+                                        shouldRoll = false;
+                                        x = placeholder.x - 33;
+                                        break;
+
+                                    case 4:
+                                        if (type == 0 || type == 1 || type == 3)
+                                            shouldDestroy = true;
+                                        break;
+
+                                    case 5:
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = true;
+                                        rollAmount = 0;
+                                        rollDirection = false;
+                                        x += 16;
+                                        break;
+
+                                    case 6:
+                                        if (type == 3)
+                                            shouldDestroy = true;
+                                        shouldRoll = true;
+                                        rollAmount = 0;
+                                        rollDirection = true;
+                                        x += 16;
+                                        break;
+
+                                    case 7:
+                                        if (type == 0)
+                                            victory = true;
+                                        else if (type != 0)
+                                            shouldDestroy = true;
+                                        break;
+                                }
                             }
                         }
                         if (safeMove)
                         {
+                            lastX = x;
                             x++;
                         }
                         else
                         {
+                            lastX = x;
                             x = (int)future.x - 1;
                             shouldRoll = false;
                         }

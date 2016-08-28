@@ -24,8 +24,8 @@ namespace RUINS
         //for input
         //yes i know this is a clumsy method
         //im changing it soon
-        public static bool[] keyDown = new bool[11];
-        public static Keys[] keyArray = new Keys[] { Keys.D0, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9 };
+        public static bool[] keyDown = new bool[12];
+        public static Keys[] keyArray = new Keys[] { Keys.D9, Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9 };
 
         //the amount of each resource available
         //this will be different between planing mode and level edit mode
@@ -206,19 +206,34 @@ namespace RUINS
             
             //render the resources list
             Program.s.render("Resources Available:", 672, 0, Brushes.Orange);
-            Program.s.render("[1] Obj. Rock (x" + resources[0, 0].ToString() + ")", 672, 20, Brushes.White);
-            Program.s.render("[2] Rock (x" + resources[1, 0].ToString() + ")", 672, 40, Brushes.White);
-            Program.s.render("[3] Platform (x" + resources[2, 0].ToString() + ")", 672, 60, Brushes.White);
-            Program.s.render("[4] Falling Plat. (x" + resources[3, 0].ToString() + ")", 672, 80, Brushes.White);
-            Program.s.render("[5] Lava (x" + resources[4, 0].ToString() + ")", 672, 100, Brushes.White);
-            Program.s.render("[6] Left Ramp (x" + resources[5, 0].ToString() + ")", 672, 120, Brushes.White);
-            Program.s.render("[7] Right Ramp (x" + resources[6, 0].ToString() + ")", 672, 140, Brushes.White);
-            Program.s.render("[8] Goal (x" + resources[7, 0].ToString() + ")", 672, 160, Brushes.White);
-            Program.s.render("[9] Delete (∞)", 672, 180, Brushes.White);
+            if (!customMap)
+            {
+                Program.s.render("[1] Obj. Rock (x" + resources[0, 0].ToString() + ")", 672, 20, Brushes.White);
+                Program.s.render("[2] Rock (x" + resources[1, 0].ToString() + ")", 672, 40, Brushes.White);
+                Program.s.render("[3] Platform (x" + resources[2, 0].ToString() + ")", 672, 60, Brushes.White);
+                Program.s.render("[4] Falling Plat. (x" + resources[3, 0].ToString() + ")", 672, 80, Brushes.White);
+                Program.s.render("[5] Lava (x" + resources[4, 0].ToString() + ")", 672, 100, Brushes.White);
+                Program.s.render("[6] Left Ramp (x" + resources[5, 0].ToString() + ")", 672, 120, Brushes.White);
+                Program.s.render("[7] Right Ramp (x" + resources[6, 0].ToString() + ")", 672, 140, Brushes.White);
+                Program.s.render("[8] Goal (x" + resources[7, 0].ToString() + ")", 672, 160, Brushes.White);
+                Program.s.render("[9] Delete (∞)", 672, 180, Brushes.White);
+            }
+            else
+            {
+                Program.s.render("[1] Obj. Rock", 672, 20, Brushes.White);
+                Program.s.render("[2] Rock", 672, 40, Brushes.White);
+                Program.s.render("[3] Platform", 672, 60, Brushes.White);
+                Program.s.render("[4] Falling Plat.", 672, 80, Brushes.White);
+                Program.s.render("[5] Lava", 672, 100, Brushes.White);
+                Program.s.render("[6] Left Ramp", 672, 120, Brushes.White);
+                Program.s.render("[7] Right Ramp", 672, 140, Brushes.White);
+                Program.s.render("[8] Goal", 672, 160, Brushes.White);
+                Program.s.render("[9] Delete", 672, 180, Brushes.White);
+            }
 
             //detect input
             //maybe move this up later
-            for(int i = 0; i< 9; i++)
+            for(int i = 0; i < 10; i++)
             {
                 if (Program.s.readKeyDown(keyArray[i]))
                     keyDown[i] = true;
@@ -258,11 +273,17 @@ namespace RUINS
                                 if (!customMap && !alreadyPlaced)
                                     resources[i, 0]--;
                             }
+                            if (keyDown[0])
+                            {
+                                //deletion tool
+                                resources[map[blockX, blockY], 0]++;
+                                map[blockX, blockY] = 0;
+                            }
                         }
                     }
                 }
             }
-            
+
         }
 
     }

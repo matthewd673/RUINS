@@ -10,7 +10,7 @@ namespace RUINS
     public class PngToArray
     {
         
-        /// <param name="pngName">Use a 20x20 png</param>
+        /// <param name="pngName">Use a 20x20 png, don't stick ".png" at the end</param>
         public static int[,] createArray(string pngName)
         {
             int[,] tempArray = new int[20, 20];
